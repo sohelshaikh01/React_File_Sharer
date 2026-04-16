@@ -9,13 +9,11 @@ Clone Repository
 
 Navigate to App
 > Cd App Name
-> Cd backend
-> npm install
 
 Install all Dependancies
 > npm install
 
 Run Project
-> npm run both
+> npm run 
 
 Thank You !!!
