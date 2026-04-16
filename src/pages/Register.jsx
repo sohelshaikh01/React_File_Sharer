@@ -52,7 +52,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-green-50">
+    <div className="flex items-center justify-center bg-linear-to-br from-blue-50 to-green-50">
       <div className="w-full shadow py-10 px-14 flex flex-row gap-10 items-center">
 
         <div className="w-3/5">

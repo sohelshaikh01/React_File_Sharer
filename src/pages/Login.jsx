@@ -44,8 +44,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full py-10 px-14  bg-linear-to-br from-blue-50 to-green-50 ">
+    <div className="flex items-center justify-center">
+      <div className="w-full py-10 px-14 bg-linear-to-br from-blue-50 to-green-50 ">
 
         <div className="w-full mx-auto bg-white rounded-3xl flex flex-row">
 
