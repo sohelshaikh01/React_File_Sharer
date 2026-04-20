@@ -61,11 +61,11 @@ export default function Transfer() {
       setSession(res.data.data);
 
       const t = await transferAPI.start({
-        receiversId: [],
+        receiversId:[],
         fileMeta: {
           fileName: file.name,
           fileSize: file.size,
-          fileHash, // ✅ include here also
+          fileHash,
         },
       });
 
@@ -82,9 +82,18 @@ export default function Transfer() {
   const startPolling = (code) => {
     pollRef.current = setInterval(async () => {
       try {
-        // ✅ FIXED payload
         const res = await sessionAPI.get(code);
-        setReceivers(res.data.data.receivers || []);
+        const recs = res.data.data.receivers || [];
+
+        setReceivers(recs);
+
+        if (recs.length >= 5) {
+
+          // update receivers
+          
+          clearInterval(pollRef.current);
+        }
+
       } catch {}
     }, 2000);
   };
@@ -100,7 +109,6 @@ export default function Transfer() {
     const dc = pc.createDataChannel("file");
     dcRef.current = dc;
 
-    // ✅ ONLY SEND candidates (correct)
     pc.onicecandidate = (e) => {
       if (e.candidate) {
         signalAPI.sendCandidate({ sessionId, candidate: e.candidate });
@@ -112,24 +120,24 @@ export default function Transfer() {
 
     await signalAPI.sendOffer({ sessionId, offer });
 
-    const poll = setInterval(async () => {
+    const answerPollRef = setInterval(async () => {
       try {
         const ans = await signalAPI.getAnswer(sessionId);
 
         if (ans.data.data) {
           await pc.setRemoteDescription(ans.data.data.data);
-          clearInterval(poll);
+          clearInterval(answerPollRef);
         }
 
-        // ❌ REMOVED → sender should NOT get candidates
       } catch {}
     }, 2000);
   };
 
   // ---------------- START ----------------
   const startSending = () => {
-    clearInterval(pollRef.current);
+    clearInterval(pollRef.current); // ✅ stop session polling
     setIsStarted(true);
+    setIsPaused(false);
     sendChunks();
   };
 
@@ -169,10 +177,14 @@ export default function Transfer() {
   };
 
   const stop = async () => {
+    clearInterval(pollRef.current); // ✅ stop session polling
+
     pcRef.current?.close();
     dcRef.current?.close();
 
-    await sessionAPI.delete(session._id);
+    if (session?._id) {
+      await sessionAPI.delete(session._id);
+    }
 
     await transferAPI.update({
       transferId: transferIdRef.current,
@@ -182,6 +194,8 @@ export default function Transfer() {
     setSession(null);
     setFile(null);
     setProgress(0);
+    setIsStarted(false);
+    setIsPaused(false);
   };
 
   const copySessionCode = () => {
@@ -218,9 +232,7 @@ export default function Transfer() {
           </div>
         ) : (
           <div className="flex flex-col max-w-2xl justify-center">
-            {/* FULL UI SAME — NOT TOUCHED */}
             
-
             {!isStarted && (
               <div className="text-center">
                 <h1 className="text-2xl font-bold">Active Room</h1>
@@ -266,8 +278,7 @@ export default function Transfer() {
 
                 {/* Repeated Code */}
                 <div className="flex flex-col items-center gap-4 my-4">
-                  <div
-                    className="relative flex items-center justify-center rounded-full"
+                  <div className="relative flex items-center justify-center rounded-full"
                     style={{
                       width: 140,
                       height: 140,
@@ -285,9 +296,7 @@ export default function Transfer() {
                 </div>
 
                 <div className="text-center">
-                  <p className="font-semibold text-lg">
-                    {file.name}
-                  </p>
+                  <p className="font-semibold text-lg"> {file.name} </p>
                   <p>
                     {fileSizer(file.size)} •{" "}
                     {fileSizer(file.size - (progress / 100) * file.size)} Remaining
@@ -295,16 +304,29 @@ export default function Transfer() {
                 </div>
 
                 <div className="flex gap-2 mt-4 justify-center p-2 rounded-full bg-slate-200/70">
-                  <button className="p-2 bg-white rounded-full" onClick={() => setIsPaused(true)}>▶️</button>
-                  <button className="p-2 bg-white rounded-full bg-linear-to-r from-blue-600 to-sky-500" onClick={() => { setIsPaused(false); sendChunks(); }}>
-                      ⏸️ </button>
-                  <button className="p-2 bg-white rounded-full" onClick={stop}>🛑</button>
+
+                  {/* LEFT → START / RESUME */}
+                  <button className="p-2 bg-white rounded-full" disabled={progress === 100}
+                    onClick={() => {
+                      setIsPaused(false);
+                      sendChunks();
+                    }} > &#9654; </button>
+
+                  {/* CENTER → PAUSE */}
+                  <button className="p-2 bg-white rounded-full bg-linear-to-r from-blue-600 to-sky-500"
+                    disabled={progress === 100} onClick={() => setIsPaused(true)} >
+                    &#10074; </button>
+
+                  {/* RIGHT → STOP */}
+                  <button className="p-2 bg-white rounded-full" onClick={stop} >
+                    &#9632; </button>
                 </div>
               </>
             )}
+
           </div>
         )}
-
+        {/* end of session */}
       </div>
     </div>
   );
