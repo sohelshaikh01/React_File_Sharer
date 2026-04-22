@@ -113,7 +113,7 @@ export default function Receive() {
               className="w-full bg-slate-200/50 text-center outline-none p-3 px-5 rounded-xl text-xl mb-4"
               placeholder="🔑 Enter Session Code" />
             <button disabled={!code} onClick={join}
-              className="rounded-xl px-5 py-2.5 bg-linear-to-r from-blue-600 to-sky-500 text-white w-full disabled:opacity-70" > Join Session ➡️ </button>
+              className="rounded-xl px-5 py-2.5 bg-linear-to-r from-blue-600 to-sky-500 text-white w-full disabled:opacity-70" > Join Session </button>
           </div>
         ) : (
           <div className="max-w-2xl flex flex-col items-center">

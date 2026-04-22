@@ -107,38 +107,65 @@ const Dashboard = () => {
       </div>
 
       {/* ================= SECTION 3 ================= */}
-      <div className="px-10 py-14">
+
+      <div className="p-10">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Recent Syncs</h3>
-          <Link to={"/history"} className="text-blue-600 text-sm">View all</Link>
+
+          <Link to="/history" className="text-blue-600 text-lg ">
+            View all
+          </Link>
         </div>
 
-        <div className="space-y-4">
+        <div className="bg-gray-100 rounded-xl p-4  space-y-3">
+
+          {/* Header */}
+          <div className="grid grid-cols-4 pb-3 border-b border-dashed text-gray-600 font-semibold">
+            <p>File Name</p>
+            <p className="text-center">Size</p>
+            <p className="text-center">Date</p>
+            <p className="text-center">Completion</p>
+          </div>
 
           {/* Item 1 */}
-          <div className="border border-gray-200 p-4 rounded">
-            <div className="flex justify-between mb-2">
-              <span>Vacation_Photos.zip</span>
-              <span className="text-green-600 text-sm">Success</span>
-            </div>
-            <div className="w-full bg-gray-200 h-2 rounded">
-              <div className="bg-blue-600 h-2 rounded w-full"></div>
+          <div className="grid grid-cols-4 items-center bg-white px-4 py-3 rounded-lg ">
+            <p className="truncate font-medium">Vacation_Photos.zip</p>
+
+            <p className="text-center text-sm text-gray-500">50 MB</p>
+
+            <p className="text-center text-xs text-gray-400">
+              {new Date().toLocaleString()}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                <div className="bg-green-500 h-full w-full"></div>
+              </div>
+              <span className="text-xs w-10 text-right">100%</span>
             </div>
           </div>
 
           {/* Item 2 */}
-          <div className="border border-gray-200 p-4 rounded">
-            <div className="flex justify-between mb-2">
-              <span>Project_Specs_V4.pdf</span>
-              <span className="text-blue-600 text-sm">84%</span>
-            </div>
-            <div className="w-full bg-gray-200 h-2 rounded">
-              <div className="bg-blue-600 h-2 rounded w-[84%]"></div>
+          <div className="grid grid-cols-4 items-center bg-white px-4 py-3 rounded-lg ">
+            <p className="truncate font-medium">Project_Specs_V4.pdf</p>
+
+            <p className="text-center text-sm text-gray-500">1 MB</p>
+
+            <p className="text-center text-xs text-gray-400">
+              {new Date().toLocaleString()}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                <div className="bg-yellow-500 h-full w-[84%]"></div>
+              </div>
+              <span className="text-xs w-10 text-right">84%</span>
             </div>
           </div>
-
+          
         </div>
       </div>
+      
     </div>
   );
 };

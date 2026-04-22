@@ -3,9 +3,7 @@ import { transferAPI } from "../api/transfer.api";
 
 // ✅ moved outside (fixes your error)
 const Card = ({ t }) => {
-  const percent =
-    t.status === "completed" ? 100 :
-    t.status === "started" ? 0 : 50;
+  const percent = t.progress;
 
   const formatFileSize = (bytes = 0) => {
     const KB = 1024;
@@ -25,20 +23,11 @@ const Card = ({ t }) => {
   return (
     <div className="grid grid-cols-4 items-center bg-white px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition border border-gray-100">
       
-      {/* File Name */}
-      <p className="font-medium text-gray-800 truncate">
-        {t.fileMeta.fileName}
-      </p>
+      <p className="font-medium text-gray-800 truncate"> {t.fileMeta.fileName} </p>
 
-      {/* Size */}
-      <p className="text-sm text-gray-500 text-center">
-        {formatFileSize(t.fileMeta.fileSize)}
-      </p>
+      <p className="text-sm text-gray-500 text-center"> {formatFileSize(t.fileMeta.fileSize)} </p>
 
-      {/* Date */}
-      <p className="text-xs text-gray-400 text-center">
-        {new Date(t.createdAt).toLocaleString()}
-      </p>
+      <p className="text-xs text-gray-400 text-center"> {new Date(t.createdAt).toLocaleString()} </p>
 
       {/* Completion */}
       <div className="flex items-center gap-2">
@@ -62,7 +51,7 @@ const Card = ({ t }) => {
   );
 };
 
-export default function History() {
+const History = () => {
   const [sentFiles, setSentFiles] = useState([]);
   const [receivedFiles, setReceivedFiles] = useState([]);
 
@@ -75,7 +64,7 @@ export default function History() {
   }, []);
 
   return (
-    <div className="py-10 px-14 bg-gradient-to-br from-blue-50 to-green-50 min-h-screen w-full">
+    <div className="py-10 px-14 bg-linear-to-br from-blue-50 to-green-50 min-h-screen w-full">
       <div className="max-w-5xl mx-auto">
 
         <h1 className="text-2xl mb-6 font-bold text-gray-800">
@@ -106,7 +95,7 @@ export default function History() {
             </div>
           </div>
         ) : (
-          <p className="mb-8 text-center text-gray-400">
+          <p className="mb-8 flex items-center bg-white px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition border border-gray-100">
             No files sent
           </p>
         )}
@@ -135,7 +124,7 @@ export default function History() {
             </div>
           </div>
         ) : (
-          <p className="mb-8 text-center text-gray-400">
+          <p className="mb-5 flex items-center bg-white px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition border border-gray-100">
             No files received
           </p>
         )}
@@ -144,3 +133,6 @@ export default function History() {
     </div>
   );
 }
+
+
+export default History;

@@ -9,14 +9,17 @@ export default function Transfer() {
   const [session, setSession] = useState(null);
   const [receivers, setReceivers] = useState([]);
   const [progress, setProgress] = useState(0);
+
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showStart, setShowStart] = useState(true);
 
   const pcRef = useRef(null);
   const dcRef = useRef(null);
   const transferIdRef = useRef(null);
   const pollRef = useRef(null);
   const offsetRef = useRef(0);
+  const progressRef = useRef(0);
 
   const fileSizer = (bytes) => {
     if (bytes >= 1024 * 1024)
@@ -89,7 +92,7 @@ export default function Transfer() {
 
         if (recs.length >= 5) {
 
-          // update receivers
+          // update receivers ####
           
           clearInterval(pollRef.current);
         }
@@ -135,10 +138,8 @@ export default function Transfer() {
 
   // ---------------- START ----------------
   const startSending = () => {
-    clearInterval(pollRef.current); // ✅ stop session polling
+    clearInterval(pollRef.current);
     setIsStarted(true);
-    setIsPaused(false);
-    sendChunks();
   };
 
   const sendChunks = () => {
@@ -150,7 +151,11 @@ export default function Transfer() {
       offsetRef.current += e.target.result.byteLength;
 
       const prog = (offsetRef.current / file.size) * 100;
+
       setProgress(prog);
+      progressRef.current = prog;
+
+      console.log("Transfer:", transferIdRef.current, prog);
 
       await transferAPI.update({
         transferId: transferIdRef.current,
@@ -159,14 +164,11 @@ export default function Transfer() {
 
       if (offsetRef.current < file.size) sendChunks();
       else {
-        // ✅ FIXED
         await transferAPI.complete(transferIdRef.current);
 
-        // ✅ delete session after complete
         if (session?._id) {
           await sessionAPI.delete(session._id);
         }
-
         toast.success("Completed");
       }
     };
@@ -176,19 +178,33 @@ export default function Transfer() {
     );
   };
 
-  const stop = async () => {
-    clearInterval(pollRef.current); // ✅ stop session polling
+  const start = () => {
+    setIsPaused(false);
+    setShowStart(false);
+    sendChunks();
+  }
 
+  const playPause = () => {
+    if(!isPaused) setIsPaused(true);
+    else {
+      setIsPaused(false);
+      sendChunks();
+    }
+  }
+
+  const stop = async () => {
+    const sessionId = session?._id; // ← capture first
+    clearInterval(pollRef.current);
     pcRef.current?.close();
     dcRef.current?.close();
 
-    if (session?._id) {
-      await sessionAPI.delete(session._id);
+    if (sessionId) {
+      await sessionAPI.delete(sessionId);
     }
 
     await transferAPI.update({
       transferId: transferIdRef.current,
-      progress: Math.floor(progress),
+      progress: Math.floor(progressRef.current),
     });
 
     setSession(null);
@@ -285,7 +301,7 @@ export default function Transfer() {
                       background: `conic-gradient(#2563eb ${progress}%, #e5e7eb ${progress}%)`,
                     }}
                   >
-                    <div className="absolute w-[110px] h-[110px] bg-white rounded-full flex flex-col items-center justify-center">
+                    <div className="absolute w-27.5 h-27.5 bg-white rounded-full flex flex-col items-center justify-center">
                       <p className="font-bold text-2xl text-blue-500">
                         {Math.floor(progress)}%
                       </p>
@@ -303,23 +319,23 @@ export default function Transfer() {
                   </p>
                 </div>
 
-                <div className="flex gap-2 mt-4 justify-center p-2 rounded-full bg-slate-200/70">
+                <div className="flex gap-4 mt-4 justify-center p-2 px-3 w-fit mx-auto rounded-full bg-slate-200/70">
 
-                  {/* LEFT → START / RESUME */}
-                  <button className="p-2 bg-white rounded-full" disabled={progress === 100}
-                    onClick={() => {
-                      setIsPaused(false);
-                      sendChunks();
-                    }} > &#9654; </button>
+                  {/* Start */}
+                  {showStart && (<button onClick={start} className={`p-2 bg-white rounded-full text-black`}>
+                    St.
+                  </button>)}
 
-                  {/* CENTER → PAUSE */}
-                  <button className="p-2 bg-white rounded-full bg-linear-to-r from-blue-600 to-sky-500"
-                    disabled={progress === 100} onClick={() => setIsPaused(true)} >
-                    &#10074; </button>
+                  {/* Pause && Resume */}
+                  {!showStart && (<button className="p-2 px-4 bg-white rounded-full bg-linear-to-r from-blue-600 to-sky-500"
+                     disabled={progress === 100} onClick={playPause}>
+                    {isPaused ? "Pl." : "Ps."}
+                  </button>)}
 
-                  {/* RIGHT → STOP */}
-                  <button className="p-2 bg-white rounded-full" onClick={stop} >
-                    &#9632; </button>
+                  {/* Stop */}
+                  <button className="p-2 px-3 bg-white rounded-full" onClick={stop} >
+                    &#9632; 
+                  </button>
                 </div>
               </>
             )}
