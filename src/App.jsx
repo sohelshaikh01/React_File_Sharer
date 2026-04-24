@@ -10,7 +10,7 @@ const Layout = () => {
   const { logout } = useAuth();
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col flex-wrap">
+    <div className="w-full app-font max-w-7xl mx-auto flex flex-col flex-wrap">
       <div className="">
         
         <nav className="h-17 flex flex-col justify-center bg-white">

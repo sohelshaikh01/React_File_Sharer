@@ -29,7 +29,7 @@ const Navbar = () => {
     }
 
   return (
-    <div className='w-full flex flex-col items-center'>
+    <div className='w-full font-sans flex flex-col items-center'>
         <div className='mx-auto w-full px-6 py-2 flex flex-row justify-between items-center'>
             <div>
                 <Link to="/">

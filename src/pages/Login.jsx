@@ -36,6 +36,7 @@ const Login = () => {
       setTimeout(() => {
         navigate("/");
       }, 800);
+      
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     } finally {
