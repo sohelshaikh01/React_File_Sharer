@@ -10,7 +10,7 @@ export const transferAPI = {
     API.post("/transfer/update", { transferId, progress }),
 
   // complete transfer
-  complete: (transferId) =>
+  complete: ({ transferId }) =>
     API.post("/transfer/complete", { transferId }),
 
   // history
