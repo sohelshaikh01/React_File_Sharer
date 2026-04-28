@@ -94,7 +94,14 @@ export default function Transfer() {
 
   const initWebRTC = async (signalSessionId) => {
     const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject",
+        },
+      ],
     });
 
     pcRef.current = pc;
@@ -102,6 +109,11 @@ export default function Transfer() {
     const dc = pc.createDataChannel("file");
     dc.binaryType = "arraybuffer";
     dcRef.current = dc;
+
+    // Message Code
+    dc.onopen = () => {
+      toast.success("Receiver connected via WebRTC!");
+    };
 
     pc.onicecandidate = (e) => {
       if (e.candidate) {
@@ -143,7 +155,6 @@ export default function Transfer() {
 
           await pc.setRemoteDescription(answer.data);
           processedAnswers.add(answerKey);
-          break;
         }
 
         if (!pc.remoteDescription) return;

@@ -48,7 +48,14 @@ export default function Receive() {
     const sessionId = s.sessionCode;
 
     const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject",
+        },
+      ],
     });
 
     pcRef.current = pc;
@@ -80,6 +87,15 @@ export default function Receive() {
       dcRef.current.binaryType = "arraybuffer";
 
       dcRef.current.onmessage = (ev) => {
+
+        // Messasing Logic
+        if (typeof ev.data === "string") {
+          const msg = JSON.parse(ev.data);
+          if (msg.type === "connected") toast.success(msg.message);
+          return;
+        }
+
+
         chunks.current.push(ev.data);
         received.current += ev.data.byteLength;
 
